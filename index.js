@@ -40,14 +40,24 @@ export default {
         const url = new URL(request.url);
         const path = url.pathname.split(/\//);
 
-        if (!path[1].trim()) return new Response(JSON.stringify({ message: "Missing ROBLOX subdomain." }), { status: 400 });
+        if (!path[1].trim()) 
+            return new Response(JSON.stringify({ message: "Missing ROBLOX subdomain." }), { status: 400 });
 
-        if (!domains.includes(path[1])) return new Response(JSON.stringify({ message: "Specified subdomain is not allowed." }), { status: 401 });
-        
-        return fetch(`https://${path[1]}.roblox.com/${path.slice(2).join("/")}${url.search}`, {
+        if (!domains.includes(path[1])) 
+            return new Response(JSON.stringify({ message: "Specified subdomain is not allowed." }), { status: 401 });
+
+        const headers = new Headers(request.headers);
+        headers.delete("host");
+
+        const init = {
             method: request.method,
-            headers: request.headers["content-type"] ? { "Content-Type": request.headers["content-type"] } : {},
-            body: request.body
-        });
+            headers,
+        };
+
+        if (request.method !== "GET" && request.method !== "HEAD") {
+            init.body = await request.text();
+        }
+
+        return fetch(`https://${path[1]}.roblox.com/${path.slice(2).join("/")}${url.search}`, init);
     }
-}
+};
