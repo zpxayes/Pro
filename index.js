@@ -32,7 +32,8 @@ const domains = [
     "trades",
     "translations",
     "users",
-    "v1"
+    "v1",
+    "v2"
 ]
 
 // Export our request handler
